@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
-  database: 'insert your db name here',
+  database: 'insert your database name here',
   password: 'insert your password here',
   port: 5432,
 });
@@ -28,6 +28,7 @@ app.get('/menu', async (req, res) => {
       SELECT 
         f.Item_Name,
         f.Item_Calories,
+        f.Item_Protein,
         STRING_AGG(i.Ingredient_Name, ', ') AS ingredients
       FROM Dininghall d
       JOIN Menu m ON d.Dininghall_id = m.Dininghall_id
@@ -43,8 +44,9 @@ app.get('/menu', async (req, res) => {
     // Format to match frontend
     const formatted = result.rows.map(row => ({
       name: row.item_name,
-      ingredients: row.ingredients,
-      calories: row.item_calories
+      ingredients: row.ingredients || "N/A",
+      calories: row.item_calories,
+      protein: row.item_protein
     }));
 
     res.json(formatted);
