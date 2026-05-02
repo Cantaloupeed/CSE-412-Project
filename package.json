@@ -1,0 +1,24 @@
+{
+  "name": "cse-412-project",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000C\u0000S\u0000E\u0000-\u00004\u00001\u00002\u0000-\u0000P\u0000r\u0000o\u0000j\u0000e\u0000c\u0000t\u0000\r\u0000 \u0000",
+  "main": "backend.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cantaloupeed/CSE-412-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cantaloupeed/CSE-412-Project/issues"
+  },
+  "homepage": "https://github.com/Cantaloupeed/CSE-412-Project#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "pg": "^8.20.0"
+  }
+}
