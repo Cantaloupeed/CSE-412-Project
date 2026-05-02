@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dining Hall Menu</title>
+
+<style>
+  :root {
+    --maroon: #8C1D40;
+    --gold: #FFC627;
+    --light-bg: #fff8e7;
+    --text-dark: #333;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: var(--light-bg);
+    color: var(--text-dark);
+  }
+
+  header {
+    background-color: var(--maroon);
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  select {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid var(--maroon);
+    border-radius: 5px;
+  }
+
+  .meal-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .meal-tabs button {
+    padding: 10px 20px;
+    border: none;
+    background-color: var(--maroon);
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.2s;
+  }
+
+  .meal-tabs button:hover {
+    background-color: #6a1630;
+  }
+
+  .active-tab {
+    background-color: var(--gold) !important;
+    color: black !important;
+  }
+
+  #menuContainer {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+  }
+
+  .menu-card {
+    background: white;
+    border-left: 6px solid var(--gold);
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  .menu-card h3 {
+    margin: 0;
+    color: var(--maroon);
+  }
+
+  .menu-card p {
+    margin: 5px 0 0;
+  }
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Dining Hall Menus</h1>
+</header>
+
+<div class="controls">
+  <select id="diningHallSelect">
+    <option value="hall1">Dining Hall 1</option>
+    <option value="hall2">Dining Hall 2</option>
+    <option value="hall3">Dining Hall 3</option>
+    <option value="hall4">Dining Hall 4</option>
+    <option value="hall5">Dining Hall 5</option>
+  </select>
+</div>
+
+<div class="meal-tabs">
+  <button onclick="setMeal('breakfast')" id="breakfastBtn">Breakfast</button>
+  <button onclick="setMeal('lunch')" id="lunchBtn">Lunch</button>
+  <button onclick="setMeal('dinner')" id="dinnerBtn">Dinner</button>
+</div>
+
+<section id="menuContainer"></section>
+
+<script> 
+/* change names later, this can be updated with payloads & HTTP requests idk how dynamic its supposed to be */
+  let selectedMeal = "breakfast";
+
+  const menuData = {
+    hall1: {
+      breakfast: [
+        {
+          name: "Pancakes",
+          description: "Served with syrup",
+          ingredients: "Flour, eggs, milk, sugar, baking powder",
+          calories: 420
+        },
+        {
+          name: "Scrambled Eggs",
+          description: "With toast",
+          ingredients: "Eggs, butter, salt, pepper, wheat toast",
+          calories: 310
+        }
+      ],
+      lunch: [
+        {
+          name: "Chicken Wrap",
+          description: "Grilled chicken and veggies",
+          ingredients: "Chicken, tortilla, lettuce, tomato, ranch",
+          calories: 560
+        }
+      ],
+      dinner: [
+        {
+          name: "Pasta Bowl",
+          description: "Tomato sauce and parmesan",
+          ingredients: "Pasta, tomato sauce, parmesan, basil",
+          calories: 640
+        }
+      ]
+    },
+
+    hall2: {
+      breakfast: [
+        {
+          name: "Breakfast Burrito",
+          description: "Eggs, cheese, potatoes",
+          ingredients: "Tortilla, eggs, cheddar, potatoes, salsa",
+          calories: 590
+        }
+      ],
+      lunch: [
+        {
+          name: "Turkey Sandwich",
+          description: "Served with chips",
+          ingredients: "Turkey, wheat bread, lettuce, tomato, mayo",
+          calories: 520
+        }
+      ],
+      dinner: [
+        {
+          name: "Rice Bowl",
+          description: "Chicken, rice, vegetables",
+          ingredients: "Rice, chicken, broccoli, carrots, soy sauce",
+          calories: 610
+        }
+      ]
+    },
+
+    hall3: { breakfast: [], lunch: [], dinner: [] },
+    hall4: { breakfast: [], lunch: [], dinner: [] },
+    hall5: { breakfast: [], lunch: [], dinner: [] }
+  };
+
+  function renderMenu() {
+    const hall = document.getElementById("diningHallSelect").value;
+    const menuContainer = document.getElementById("menuContainer");
+
+    const items = menuData[hall][selectedMeal];
+
+    document.querySelectorAll(".meal-tabs button").forEach(btn => {
+      btn.classList.remove("active-tab");
+    });
+
+    document.getElementById(selectedMeal + "Btn").classList.add("active-tab");
+
+    if (items.length === 0) {
+      menuContainer.innerHTML = `<h2>No items available</h2>`;
+      return;
+    }
+
+    menuContainer.innerHTML = `
+      <h2>${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)} Menu</h2>
+    `;
+
+    items.forEach(item => {
+      menuContainer.innerHTML += `
+        <div class="menu-card">
+          <h3>${item.name}</h3>
+          <p>${item.description}</p>
+
+          <div class="menu-details">
+            <p><strong>Ingredients:</strong> ${item.ingredients}</p>
+            <p><strong>Calories:</strong> ${item.calories}</p>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  function setMeal(meal) {
+    selectedMeal = meal;
+    renderMenu();
+  }
+
+  document.getElementById("diningHallSelect").addEventListener("change", renderMenu);
+
+  renderMenu();
+</script>
+
+</body>
+</html>
