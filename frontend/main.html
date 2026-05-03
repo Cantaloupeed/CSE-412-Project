@@ -48,7 +48,9 @@
     margin-bottom: 20px;
   }
 
-  .meal-tabs button {
+  .meal-tabs button,
+  .admin-panel button,
+  .card-actions button {
     padding: 10px 20px;
     border: none;
     background-color: var(--maroon);
@@ -56,9 +58,12 @@
     cursor: pointer;
     border-radius: 5px;
     transition: 0.2s;
+    margin-top: 8px;
   }
 
-  .meal-tabs button:hover {
+  .meal-tabs button:hover,
+  .admin-panel button:hover,
+  .card-actions button:hover {
     background-color: #6a1630;
   }
 
@@ -67,13 +72,15 @@
     color: black !important;
   }
 
-  #menuContainer {
+  #menuContainer,
+  .admin-panel {
     max-width: 800px;
     margin: auto;
     padding: 20px;
   }
 
-  .menu-card {
+  .menu-card,
+  .admin-panel {
     background: white;
     border-left: 6px solid var(--gold);
     padding: 15px;
@@ -82,13 +89,35 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   }
 
-  .menu-card h3 {
-    margin: 0;
+  .menu-card h3,
+  .admin-panel h2 {
+    margin-top: 0;
     color: var(--maroon);
   }
 
   .menu-card p {
     margin: 5px 0 0;
+  }
+
+  .menu-details {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #fff3c4;
+    border-radius: 6px;
+  }
+
+  .admin-panel input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    padding: 10px;
+    border: 2px solid var(--maroon);
+    border-radius: 6px;
+  }
+
+  .card-actions {
+    margin-top: 12px;
   }
 </style>
 </head>
@@ -118,9 +147,22 @@
 
 <section id="menuContainer"></section>
 
-<script> 
-/* change names later, this can be updated with payloads & HTTP requests idk how dynamic its supposed to be */
-  let selectedMeal = "breakfast";
+<section class="admin-panel">
+  <h2>Manage Menu Items</h2>
+
+  <input type="hidden" id="editId">
+
+  <input id="itemName" placeholder="Item name">
+  <input id="itemIngredients" placeholder="Ingredients">
+  <input id="itemCalories" type="number" placeholder="Calories">
+  <input id="itemProtein" type="number" placeholder="Protein in grams">
+
+  <button onclick="saveItem()">Save Item</button>
+  <button onclick="clearForm()">Cancel</button>
+</section>
+
+<script>
+  let selectedMeal = "Breakfast";
 
   async function renderMenu() {
     const hall = document.getElementById("diningHallSelect").value;
@@ -141,9 +183,7 @@
         return;
       }
 
-      menuContainer.innerHTML = `
-        <h2>${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)} Menu</h2>
-      `;
+      menuContainer.innerHTML = `<h2>${selectedMeal} Menu</h2>`;
 
       items.forEach(item => {
         menuContainer.innerHTML += `
@@ -155,19 +195,89 @@
               <p><strong>Calories:</strong> ${item.calories}</p>
               <p><strong>Protein:</strong> ${item.protein}g</p>
             </div>
+
+            <div class="card-actions">
+              <button onclick='editItem(${JSON.stringify(item)})'>Edit</button>
+              <button onclick="deleteItem('${item.id}')">Delete</button>
+            </div>
           </div>
         `;
       });
 
     } catch (err) {
       console.error(err);
-      menuContainer.innerHTML = "";
+      menuContainer.innerHTML = `<h2>Could not load menu items.</h2>`;
     }
   }
 
   function setMeal(meal) {
     selectedMeal = meal;
     renderMenu();
+  }
+
+  async function saveItem() {
+    const hall = document.getElementById("diningHallSelect").value;
+    const id = document.getElementById("editId").value;
+
+    const item = {
+      hall: hall,
+      meal: selectedMeal,
+      name: document.getElementById("itemName").value.replace(/\s/g, "_"),
+      ingredients: document.getElementById("itemIngredients").value.replace(/\s/g, "_"),
+      calories: document.getElementById("itemCalories").value,
+      protein: document.getElementById("itemProtein").value
+    };
+
+    if (!item.name || !item.ingredients || !item.calories || !item.protein) {
+      alert("Please fill out all fields.");
+      return;
+    }
+
+    if (id) {
+      await fetch(`/menu/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(item)
+      });
+    } else {
+      await fetch("/menu", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(item)
+      });
+    }
+
+    clearForm();
+    renderMenu();
+  }
+
+  function editItem(item) {
+    document.getElementById("editId").value = item.id;
+    document.getElementById("itemName").value = item.name.replace(/_/g, " ");
+    document.getElementById("itemIngredients").value = item.ingredients.replace(/_/g, " ");
+    document.getElementById("itemCalories").value = item.calories;
+    document.getElementById("itemProtein").value = item.protein;
+  }
+
+  async function deleteItem(id) {
+    await fetch(`/menu/${id}`, {
+      method: "DELETE"
+    });
+
+    clearForm();
+    renderMenu();
+  }
+
+  function clearForm() {
+    document.getElementById("editId").value = "";
+    document.getElementById("itemName").value = "";
+    document.getElementById("itemIngredients").value = "";
+    document.getElementById("itemCalories").value = "";
+    document.getElementById("itemProtein").value = "";
   }
 
   document.getElementById("diningHallSelect").addEventListener("change", renderMenu);

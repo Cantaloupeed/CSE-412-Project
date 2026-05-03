@@ -13,8 +13,8 @@ app.get('/', (req, res) => {
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
-  database: 'insert your database name here',
-  password: 'insert your password here',
+  database: 'Food',
+  password: 'password',
   port: 5432,
 });
 
