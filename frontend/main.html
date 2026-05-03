@@ -154,8 +154,8 @@
 
   <input id="itemName" placeholder="Item name">
   <input id="itemIngredients" placeholder="Ingredients">
-  <input id="itemCalories" type="number" placeholder="Calories">
-  <input id="itemProtein" type="number" placeholder="Protein in grams">
+  <input id="itemCalories" type="number" placeholder="Calories" min="0">
+  <input id="itemProtein" type="number" placeholder="Protein in grams" min="0">
 
   <button onclick="saveItem()">Save Item</button>
   <button onclick="clearForm()">Cancel</button>
@@ -216,6 +216,13 @@
   }
 
   async function saveItem() {
+    const calories = Number(document.getElementById("itemCalories").value);
+    const protein = Number(document.getElementById("itemProtein").value);
+
+    if (calories < 0 || protein < 0) {
+      alert("Calories and protein cannot be negative.");
+      return;
+    }
     const hall = document.getElementById("diningHallSelect").value;
     const id = document.getElementById("editId").value;
 
