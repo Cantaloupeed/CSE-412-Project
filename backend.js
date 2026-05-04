@@ -13,8 +13,8 @@ app.get('/', (req, res) => {
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
-  database: 'GroupProject',
-  password: 'AZBucksIn621',
+  database: 'GroupProject', // Ensure this is the correct name for your db
+  password: 'password', // Ensure this is the correct password
   port: 5432,
 });
 
@@ -129,6 +129,8 @@ app.delete('/menu/:id', async (req, res) => {
   res.status(500).send("Delete failed");
   }
 });
+
+// API call for Update functionality
 
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
