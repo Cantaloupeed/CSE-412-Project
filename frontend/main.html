@@ -350,7 +350,7 @@ async function saveEdit() {
   const item = {
     hall: hall,
     meal: selectedMeal,
-    name: document.getElementById("modalItemName").value,
+    name: document.getElementById("modalItemName").value.replace(/\s/g, "_"),
     ingredients: document.getElementById("modalItemIngredients").value,
     calories: calories,
     protein: protein
@@ -361,7 +361,7 @@ async function saveEdit() {
     return;
   }
 
-  await fetch(`/menu/${id}`, {
+  const response = await fetch(`/menu/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
@@ -369,10 +369,16 @@ async function saveEdit() {
     body: JSON.stringify(item)
   });
 
-  closeEditModal();
-  renderMenu();
-}
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Update failed:", errorText);
+    alert("Update failed. Check backend terminal.");
+    return;
+  }
 
+  closeEditModal();
+  await renderMenu();
+}
   document.getElementById("diningHallSelect").addEventListener("change", renderMenu);
 
   renderMenu();

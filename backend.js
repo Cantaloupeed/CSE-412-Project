@@ -132,6 +132,68 @@ app.delete('/menu/:id', async (req, res) => {
 
 // API call for Update functionality
 
+// API route for Update functionality
+app.put('/menu/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, calories, protein, ingredients } = req.body;
+
+  if (calories < 0 || protein < 0) {
+    return res.status(400).send("Calories and protein cannot be negative.");
+  }
+
+  try {
+    // Update Fooditems table
+      const updateResult = await pool.query(
+        `
+        UPDATE Fooditems
+        SET Item_Name = $1,
+            Item_Calories = $2,
+            Item_Protein = $3
+        WHERE Item_id = $4
+        `,
+        [name, calories, protein, id]
+      );
+
+      if (updateResult.rowCount === 0) {
+        return res.status(404).send("No food item found with that ID.");
+      };
+
+    // Replace old ingredients with new ingredients
+    await pool.query(
+      `DELETE FROM Ingredients WHERE Item_id = $1`,
+      [id]
+    );
+
+    if (ingredients) {
+      const list = ingredients.split(',').map(i => i.trim());
+
+      const ingResult = await pool.query(
+        `SELECT COALESCE(MAX(Ingredient_id), 0) AS max FROM Ingredients`
+      );
+
+      let nextIngId = ingResult.rows[0].max + 1;
+
+      for (let ing of list) {
+        await pool.query(
+          `
+          INSERT INTO Ingredients (Ingredient_id, Item_id, Ingredient_Name)
+          VALUES ($1, $2, $3)
+          `,
+          [nextIngId, id, ing]
+        );
+
+        nextIngId++;
+      }
+    }
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Update failed");
+  }
+});
+
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
 });
