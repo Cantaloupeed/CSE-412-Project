@@ -169,7 +169,7 @@ Example using `psql` from the project root:
 
 Alternatively:
 
-Open up the schemas dropdown, then the tables dropdown, and right-click the campus table and select  ‘Import/Export Data’.
+Inside pgAdmin, open up the schemas dropdown, then the tables dropdown, and right-click the campus table and select  ‘Import/Export Data’.
 
 In the ‘Options’ tab, select the setting to set ‘Header’ to true, and set the delimiter to ‘,’. Once this is done, return to the General tab and in the ‘Filename' entry, enter the filepath for the CampusSchema.csv file. Finally, click ‘OK’.
 
