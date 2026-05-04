@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
-  database: 'GroupProject', // Ensure this is the correct name for your db
+  database: 'Food', // Ensure this is the correct name for your db
   password: 'password', // Ensure this is the correct password
   port: 5432,
 });

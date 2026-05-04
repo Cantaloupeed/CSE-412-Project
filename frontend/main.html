@@ -119,6 +119,48 @@
   .card-actions {
     margin-top: 12px;
   }
+
+  .modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background: white;
+  max-width: 500px;
+  margin: 100px auto;
+  padding: 25px;
+  border-radius: 10px;
+  border-top: 8px solid var(--gold);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.modal-content h2 {
+  color: var(--maroon);
+}
+
+.modal-content input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 2px solid var(--maroon);
+  border-radius: 6px;
+}
+
+.modal-content button {
+  background: var(--maroon);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 8px;
+}
 </style>
 </head>
 
@@ -229,8 +271,8 @@
     const item = {
       hall: hall,
       meal: selectedMeal,
-      name: document.getElementById("itemName").value.replace(/\s/g, "_"),
-      ingredients: document.getElementById("itemIngredients").value.replace(/\s/g, "_"),
+      name: document.getElementById("modalItemName").value.replace(/\s/g, "_"),
+      ingredients: document.getElementById("modalItemIngredients").value.replace(/\s/g, "_"),
       calories: document.getElementById("itemCalories").value,
       protein: document.getElementById("itemProtein").value
     };
@@ -263,12 +305,14 @@
   }
 
   function editItem(item) {
-    document.getElementById("editId").value = item.id;
-    document.getElementById("itemName").value = item.name.replace(/_/g, " ");
-    document.getElementById("itemIngredients").value = item.ingredients.replace(/_/g, " ");
-    document.getElementById("itemCalories").value = item.calories;
-    document.getElementById("itemProtein").value = item.protein;
-  }
+  document.getElementById("modalEditId").value = item.id;
+  document.getElementById("modalItemName").value = item.name.replace(/_/g, " ");
+  document.getElementById("modalItemIngredients").value = item.ingredients.replace(/_/g, " ");
+  document.getElementById("modalItemCalories").value = item.calories;
+  document.getElementById("modalItemProtein").value = item.protein;
+
+  document.getElementById("editModal").style.display = "block";
+}
 
   async function deleteItem(id) {
     await fetch(`/menu/${id}`, {
@@ -287,10 +331,66 @@
     document.getElementById("itemProtein").value = "";
   }
 
+  function closeEditModal() {
+  document.getElementById("editModal").style.display = "none";
+}
+
+async function saveEdit() {
+  const id = document.getElementById("modalEditId").value;
+  const hall = document.getElementById("diningHallSelect").value;
+
+  const calories = Number(document.getElementById("modalItemCalories").value);
+  const protein = Number(document.getElementById("modalItemProtein").value);
+
+  if (calories < 0 || protein < 0) {
+    alert("Calories and protein cannot be negative.");
+    return;
+  }
+
+  const item = {
+    hall: hall,
+    meal: selectedMeal,
+    name: document.getElementById("modalItemName").value,
+    ingredients: document.getElementById("modalItemIngredients").value,
+    calories: calories,
+    protein: protein
+  };
+
+  if (!item.name || !item.ingredients || isNaN(item.calories) || isNaN(item.protein)) {
+    alert("Please fill out all fields.");
+    return;
+  }
+
+  await fetch(`/menu/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(item)
+  });
+
+  closeEditModal();
+  renderMenu();
+}
+
   document.getElementById("diningHallSelect").addEventListener("change", renderMenu);
 
   renderMenu();
 </script>
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <h2>Edit Menu Item</h2>
 
+    <input type="hidden" id="modalEditId">
+
+    <input id="modalItemName" placeholder="Item name">
+    <input id="modalItemIngredients" placeholder="Ingredients">
+    <input id="modalItemCalories" type="number" placeholder="Calories" min="0">
+    <input id="modalItemProtein" type="number" placeholder="Protein in grams" min="0">
+
+    <button onclick="saveEdit()">Save Changes</button>
+    <button onclick="closeEditModal()">Cancel</button>
+  </div>
+</div>
 </body>
 </html>
