@@ -167,6 +167,15 @@ Example using `psql` from the project root:
 \copy Ingredients FROM 'CSV FIles for DB/IngredientsSchema.csv' WITH (FORMAT csv, HEADER true);
 ```
 
+Alternatively:
+
+Open up the schemas dropdown, then the tables dropdown, and right-click the campus table and select  ‘Import/Export Data’.
+
+In the ‘Options’ tab, select the setting to set ‘Header’ to true, and set the delimiter to ‘,’. Once this is done, return to the General tab and in the ‘Filename' entry, enter the filepath for the CampusSchema.csv file. Finally, click ‘OK’.
+
+Repeat the last step for the rest of the tables in the order of DiningHall -> Menu -> FoodItems -> Ingredients. Use their respective CSV files (DininghallSchema, MenuSchema, FoodItemsSchema, and IngredientsSchema).
+
+
 ### 4. Configure the Database Connection
 
 The database connection is defined in `backend.js`:
